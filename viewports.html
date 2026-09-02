@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Por qué diseñar responsive</title>
+<style>
+  body { margin:0; padding:28px; background:#14171a; color:#e6e6e6;
+         font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  p.sub { margin:0 0 28px; color:#9aa0a6; max-width:78ch; }
+  .col { margin-bottom:36px; }
+  .col > h2 { font-size:15px; margin:0 0 4px; padding:7px 14px; border-radius:4px;
+               display:inline-block; }
+  .col > p { margin:0 0 14px; color:#9aa0a6; font-size:13px; }
+  .sin h2 { background:#4a1f22; color:#ffb4b4; }
+  .con h2 { background:#123a2a; color:#7fe0b0; }
+  .row { display:flex; gap:22px; align-items:flex-start; overflow-x:auto;
+          padding-bottom:14px; }
+  figure { margin:0; }
+  figcaption { padding:6px 0; font-weight:600; white-space:nowrap; }
+  figcaption span { color:#9aa0a6; font-weight:400; }
+  iframe { border:1px solid #3a4045; background:#000; display:block; }
+  code { background:#22272b; padding:1px 5px; border-radius:3px; }
+</style></head>
+<body>
+<h1>Lo mismo, con y sin reglas responsive</h1>
+<p class="sub">El markup es idéntico en las ocho ventanas. Lo único que cambia es
+el CSS: abajo se le quitaron los <strong>234 bloques <code>@media</code></strong>
+que dependen del ancho — 31 KB de 136 KB del CSS global, casi un cuarto del
+archivo. Cada iframe es un viewport real.</p>
+
+<div class="col con">
+  <h2>Con responsive</h2>
+  <p>El CSS tal cual está hoy en producción.</p>
+  <div class="row">
+      <figure>
+        <figcaption>Desktop <span>1280px</span></figcaption>
+        <iframe src="index.html" width="1280" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Tablet <span>768px</span></figcaption>
+        <iframe src="index.html" width="768" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Mobile grande <span>414px</span></figcaption>
+        <iframe src="index.html" width="414" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Mobile chico <span>375px</span></figcaption>
+        <iframe src="index.html" width="375" height="380" loading="lazy"></iframe>
+      </figure></div>
+</div>
+
+<div class="col sin">
+  <h2>Sin responsive</h2>
+  <p>El mismo CSS con todos los <code>@media</code> de ancho eliminados.</p>
+  <div class="row">
+      <figure>
+        <figcaption>Desktop <span>1280px</span></figcaption>
+        <iframe src="index.html?roto" width="1280" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Tablet <span>768px</span></figcaption>
+        <iframe src="index.html?roto" width="768" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Mobile grande <span>414px</span></figcaption>
+        <iframe src="index.html?roto" width="414" height="380" loading="lazy"></iframe>
+      </figure>
+      <figure>
+        <figcaption>Mobile chico <span>375px</span></figcaption>
+        <iframe src="index.html?roto" width="375" height="380" loading="lazy"></iframe>
+      </figure></div>
+</div>
+
+<script>
+/* Los iframes muestran solo las cards: header y hero se ocultan desde acá,
+   sin tocar index.html. */
+const LIMPIAR = `
+  header, [class*="page-header_"], [class*="lenis-scrollbar"] { display:none !important; }
+  [class*="app-layout__content"], main, body { padding-top:0 !important; margin-top:0 !important; }
+  [class*="main__content"] { padding-top:12px !important; }
+`;
+addEventListener('load', () => setTimeout(() => {
+  document.querySelectorAll('iframe').forEach(f => {
+    try {
+      const s = f.contentDocument.createElement('style');
+      s.textContent = LIMPIAR;
+      f.contentDocument.head.appendChild(s);
+      f.contentWindow.scrollTo(0, 0);
+    } catch (e) {}
+  });
+}, 700));
+</script>
+</body></html>

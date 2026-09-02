@@ -1,0 +1,40 @@
+/* Prototipo del fix para las cards de Próximamente.
+   Se carga solo con ?fix en la URL; sin eso la página queda como prep. */
+
+/* 1. La fecha ocupa lo que necesita, no la mitad de la card.
+      width:50% dejaba ~100px para el título entre 701px y desktop. */
+.proximamente_dateContainer__FHB5x {
+  width: auto;
+  flex: 0 0 auto;
+  padding-inline: 16px;
+}
+
+/* 2. El texto se queda con todo el espacio restante. */
+.proximamente_metadataContainer__N08wQ {
+  flex: 1 1 auto;
+}
+
+/* 3. El título usa hasta dos líneas en vez de truncarse en una. */
+.proximamente_metadataContainer__N08wQ h4 {
+  white-space: normal;
+  text-overflow: clip;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 4. La card crece si el contenido lo pide, en vez de recortarlo. */
+.proximamente_card__Tl2Fw {
+  height: auto;
+  min-height: 180px;
+}
+
+/* 5. Se quitan los order del breakpoint mobile: el DOM ya viene en el
+      orden correcto (imagen, texto, fecha) y el order lo invertía. */
+@media (max-width: 700px) {
+  .proximamente_metadataContainer__N08wQ,
+  .proximamente_dateContainer__FHB5x {
+    order: 0;
+  }
+}

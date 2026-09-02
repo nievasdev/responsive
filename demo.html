@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Por qué diseñar responsive</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px 28px; background:#14171a; color:#e6e6e6;
+         font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  h1 { font-size:20px; margin:0 0 18px; }
+  .panel { display:flex; gap:28px; align-items:center; flex-wrap:wrap;
+           background:#1c2126; border:1px solid #2c3238; border-radius:8px;
+           padding:16px 20px; margin-bottom:22px; }
+  .ancho { display:flex; align-items:center; gap:14px; flex:1; min-width:340px; }
+  input[type=range] { flex:1; accent-color:#7fe0b0; }
+  .valor { font:700 22px/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+           min-width:96px; text-align:right; }
+  .presets { display:flex; gap:8px; }
+  .presets button, .modo button {
+    background:#2b3238; color:#e6e6e6; border:1px solid #3a4045;
+    border-radius:5px; padding:7px 13px; cursor:pointer; font-size:13px; }
+  .presets button:hover, .modo button:hover { background:#39424a; }
+  .modo { display:flex; gap:10px; align-items:center; }
+  #toggle { font-weight:700; min-width:190px; }
+  #toggle.con { background:#123a2a; border-color:#1d5f45; color:#7fe0b0; }
+  #toggle.sin { background:#4a1f22; border-color:#7a3339; color:#ffb4b4; }
+  .escenario { background:#22272b; border-radius:5px; padding:7px 13px;
+               font-size:13px; color:#9aa0a6; }
+  .marco { display:flex; justify-content:center; }
+  iframe { border:1px solid #3a4045; background:#000; display:block;
+           height:600px; }
+</style></head>
+<body>
+<h1>Lo mismo, con y sin reglas responsive</h1>
+
+<div class="panel">
+  <div class="ancho">
+    <span>Ancho</span>
+    <input type="range" id="slider" min="320" max="1440" step="1" value="1280">
+    <span class="valor" id="valor">1280px</span>
+  </div>
+  <div class="presets">
+    <button data-w="1440">Desktop</button>
+    <button data-w="1024">Laptop</button>
+    <button data-w="768">Tablet</button>
+    <button data-w="414">Mobile</button>
+    <button data-w="320">Chico</button>
+  </div>
+  <div class="modo">
+    <button id="toggle" class="con">CON responsive</button>
+    <span class="escenario" id="escenario"></span>
+  </div>
+</div>
+
+<div class="marco"><iframe id="vista" src="index.html" width="1280"></iframe></div>
+
+<script>
+const slider = document.getElementById('slider');
+const valor  = document.getElementById('valor');
+const toggle = document.getElementById('toggle');
+const esc    = document.getElementById('escenario');
+const vista  = document.getElementById('vista');
+let sinResponsive = false;
+
+/* Los iframes muestran solo las cards: header y hero se ocultan desde acá,
+   sin tocar index.html. */
+const LIMPIAR = `
+  header, [class*="page-header_"], [class*="lenis-scrollbar"] { display:none !important; }
+  [class*="app-layout__content"], main, body { padding-top:0 !important; margin-top:0 !important; }
+  [class*="main__content"] { padding-top:14px !important; }
+`;
+
+function limpiar() {
+  try {
+    const cd = vista.contentDocument;
+    const s = cd.createElement('style');
+    s.textContent = LIMPIAR;
+    cd.head.appendChild(s);
+  } catch (e) {}
+}
+vista.addEventListener('load', () => setTimeout(limpiar, 250));
+
+function medir() {
+  try {
+    const cd = vista.contentDocument;
+    const meta = cd.querySelector('[class*="metadataContainer"]');
+    const card = cd.querySelector('[class*="proximamente_card"]');
+    if (!meta || !card) return;
+    const px = Math.round(meta.getBoundingClientRect().width);
+    const col = getComputedStyle(card).flexDirection === 'column';
+    const fuera = cd.documentElement.scrollWidth - vista.contentWindow.innerWidth;
+    if (fuera > 2) {
+      esc.textContent = `\u26a0 la card se sale ${fuera}px de la pantalla`;
+      esc.style.color = '#ffb4b4';
+    } else {
+      esc.textContent = col
+        ? `la card se apila \u2014 texto ${px}px`
+        : `texto en ${px}px de ancho`;
+      esc.style.color = '';
+    }
+  } catch (e) { esc.textContent = ''; }
+}
+
+function aplicar(w) {
+  vista.width = w;
+  valor.textContent = w + 'px';
+  setTimeout(medir, 450);
+}
+
+slider.addEventListener('input', () => aplicar(+slider.value));
+document.querySelectorAll('.presets button').forEach(b =>
+  b.addEventListener('click', () => { slider.value = b.dataset.w; aplicar(+b.dataset.w); }));
+
+toggle.addEventListener('click', () => {
+  sinResponsive = !sinResponsive;
+  toggle.className = sinResponsive ? 'sin' : 'con';
+  toggle.textContent = sinResponsive ? 'SIN responsive' : 'CON responsive';
+  vista.src = sinResponsive ? 'index.html?roto' : 'index.html';
+  setTimeout(medir, 700);
+});
+
+setTimeout(medir, 1000);
+</script>
+</body></html>

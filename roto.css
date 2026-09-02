@@ -1,0 +1,16 @@
+/* Exageración para la exposición. Se carga sólo con ?roto, junto con los CSS
+   sin @media. La card declara un ancho mínimo de escritorio: por debajo de
+   ~1160px de viewport ya no entra, desborda el contenedor y la página pide
+   scroll horizontal. La fecha y la hora quedan fuera de la pantalla. */
+
+[class*="proximamente_card__"] {
+  min-width: 1100px;
+}
+
+/* Sin esto el contenedor recorta el desborde y no se ve nada raro:
+   la card se saldría en silencio. Queremos que se vea salirse. */
+[class*="main__content"],
+[class*="app-layout__content"],
+main {
+  overflow-x: visible !important;
+}
